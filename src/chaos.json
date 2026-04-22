@@ -9,7 +9,17 @@
     "How did you end up with the",
     "What is your hottest take on the",
     "What is the least expected",
-    "What should everyone avoid in the"
+    "What should everyone avoid in the",
+    "What was the first",
+    "If you had to speedrun the",
+    "What unexpectedly became your",
+    "Which part of your day has the most",
+    "When did you last celebrate a",
+    "What is your secret weapon for the",
+    "What is the weirdly effective",
+    "If we opened your tabs, what is the most",
+    "Which recent win came from a",
+    "What is the boldest"
   ],
   "descriptors": [
     "embarrassing",
@@ -21,7 +31,17 @@
     "mildly cursed",
     "unexpectedly wholesome",
     "high-risk",
-    "legendary"
+    "legendary",
+    "delightfully weird",
+    "battle-tested",
+    "overlooked",
+    "duct-taped",
+    "productivity-maxing",
+    "low-key brilliant",
+    "wildcard",
+    "too-honest",
+    "future-proof-ish",
+    "surprisingly chaotic-good"
   ],
   "topics": [
     "thing at this event",
@@ -33,6 +53,16 @@
     "demo you have seen this week",
     "engineering hill you will die on",
     "meeting format in your company",
-    "hackathon strategy for day one"
+    "hackathon strategy for day one",
+    "habit that keeps you sane during launches",
+    "prompt you keep reusing",
+    "debug story you still tell people",
+    "automation you trust a little too much",
+    "side quest that improved your main project",
+    "default setting you always change first",
+    "tab you refuse to close",
+    "team ritual that actually works",
+    "way you recover after a failed demo",
+    "tool you adopted this year"
   ]
 }
