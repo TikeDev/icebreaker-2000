@@ -2,8 +2,9 @@
 
 IceBreaker 2000 is a static PWA that generates networking prompts with a Vegas slot-machine + Y2K aesthetic.
 
-- Mode 1 (`SAFE`): fully implemented single-reel spin with deceleration that lands on one question.
-- Mode 2 (`CHAOS`): UI scaffolded with 3 reels (`Opener`, `Descriptor`, `Topic`) and TODO logic stub.
+- `SAFE` mode is fully implemented as a single-reel spin that decelerates and lands on one question.
+- `CHAOS` mode is fully implemented with 3 independent reels (`Opener`, `Descriptor`, `Topic`) that stop in sequence and compose one prompt.
+- Theme controls are implemented with palette cycling and light/dark mode.
 
 ## Tech Stack
 
@@ -13,27 +14,38 @@ IceBreaker 2000 is a static PWA that generates networking prompts with a Vegas s
 - `vite-plugin-pwa`
 - Raw CSS in `src/App.css` (no Tailwind)
 
-## Quick Start
+## Commands
 
 ```bash
 pnpm install
 pnpm dev
-```
-
-Then open the local Vite URL shown in terminal.
-
-## Build & Preview
-
-```bash
 pnpm build
 pnpm preview
-```
-
-Optional type check:
-
-```bash
+pnpm lint
 pnpm typecheck
+pnpm prepare
 ```
+
+`pnpm prepare` installs Husky hooks for local git workflows.
+
+## Modes
+
+- `SAFE`
+  - Single reel (`questions.json`)
+  - Fast-to-slow deceleration until final question
+- `CHAOS`
+  - Three reels (`openers`, `descriptors`, `topics` from `chaos.json`)
+  - Independent spin state and timeout handling per reel
+  - Staggered stop timing with composed final display text
+
+## Theme System
+
+- Palettes: `classic-vegas`, `art-deco`, `retro-neon`
+- Light/dark mode toggle
+- Palette and theme mode are persisted in `localStorage`
+- Main files:
+  - `src/components/ThemeControls.tsx`
+  - `src/theme.ts`
 
 ## Cloudflare Pages Deploy
 
@@ -49,6 +61,7 @@ src/
   App.tsx
   App.css
   main.tsx
+  theme.ts
   questions.json
   chaos.json
   components/
@@ -56,13 +69,22 @@ src/
     Reel.tsx
     SpinButton.tsx
     ModeToggle.tsx
+    ThemeControls.tsx
 ```
 
 ## PWA Notes
 
 - PWA is configured in `vite.config.ts` via `vite-plugin-pwa`.
-- Manifest includes app metadata and icons in `public/`.
-- Service worker registration is auto-injected for production builds.
+- Registration is configured with `registerType: 'autoUpdate'` and `injectRegister: 'auto'`.
+- Manifest metadata and icons are defined in `vite.config.ts` and sourced from `public/`.
+- Build output includes generated service worker assets in `dist/`.
+
+## Quality Gates
+
+- Husky pre-commit hook runs:
+  - `pnpm lint`
+  - `pnpm build`
+- Hook script location: `.husky/pre-commit`
 
 ## UX Notes
 
