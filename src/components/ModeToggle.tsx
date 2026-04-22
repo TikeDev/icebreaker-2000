@@ -16,7 +16,7 @@ function ModeToggle({ mode, onChange, disabled }: ModeToggleProps) {
       onClick={() => onChange(nextMode)}
       disabled={disabled}
     >
-      SAFE / CHAOS: <span>{mode === 'safe' ? 'SAFE' : 'CHAOS'}</span>
+      MODE: <span>{mode === 'safe' ? 'SAFE' : 'CHAOS'}</span>
     </button>
   )
 }

@@ -29,7 +29,7 @@ function ThemeControls({
         onClick={onPaletteCycle}
         aria-label={`Cycle palette. Current palette: ${PALETTE_SHORT_LABELS[selectedPalette]}.`}
       >
-        PALETTE: <span>{PALETTE_SHORT_LABELS[selectedPalette]}</span>
+        THEME: <span>{PALETTE_SHORT_LABELS[selectedPalette]}</span>
       </button>
       <button
         type="button"

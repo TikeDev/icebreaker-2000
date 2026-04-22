@@ -479,7 +479,8 @@ function SlotMachine({
             </button>
             {showHelp ? (
               <p className="help-popover" id="slot-help">
-                Spin to get a question. Ask it to a stranger.
+                Spin to get a random question. Ask it to a stranger to break the ice!<br/>
+                <b>CHAOS MODE:</b> combine 3 random parts into one surprise icebreaker!
               </p>
             ) : null}
           </div>
