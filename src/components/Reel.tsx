@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 
 interface ReelProps {
   items: string[]
@@ -8,9 +8,12 @@ interface ReelProps {
   label: string
 }
 
-const ROW_HEIGHT_PX = 36
-const ACTIVE_ROW_INDEX = 2
+const DESKTOP_ROW_HEIGHT_PX = 36
+const MOBILE_ROW_HEIGHT_PX = 28
+const DESKTOP_VISIBLE_ROWS = 5
+const MOBILE_VISIBLE_ROWS = 3
 const RENDERED_ROW_COUNT = 7
+const MOBILE_BREAKPOINT_QUERY = '(max-width: 560px)'
 
 const modulo = (value: number, divisor: number) => {
   const remainder = value % divisor
@@ -18,16 +21,45 @@ const modulo = (value: number, divisor: number) => {
 }
 
 function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
+  const [isCompactLayout, setIsCompactLayout] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return false
+    }
+
+    return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches
+  })
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return
+    }
+
+    const mediaQueryList = window.matchMedia(MOBILE_BREAKPOINT_QUERY)
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsCompactLayout(event.matches)
+    }
+
+    setIsCompactLayout(mediaQueryList.matches)
+    mediaQueryList.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQueryList.removeEventListener('change', handleChange)
+    }
+  }, [])
+
   if (items.length === 0) {
     return null
   }
 
+  const rowHeightPx = isCompactLayout ? MOBILE_ROW_HEIGHT_PX : DESKTOP_ROW_HEIGHT_PX
+  const visibleRowCount = isCompactLayout ? MOBILE_VISIBLE_ROWS : DESKTOP_VISIBLE_ROWS
+  const activeRowIndex = Math.floor(visibleRowCount / 2)
   const normalizedPosition = modulo(position, items.length)
   const baseIndex = Math.floor(normalizedPosition)
   const rowOffset = normalizedPosition - baseIndex
 
   const visibleRows = Array.from({ length: RENDERED_ROW_COUNT }, (_, rowIndex) => {
-    const relativeOffset = rowIndex - ACTIVE_ROW_INDEX
+    const relativeOffset = rowIndex - activeRowIndex
     const itemIndex = modulo(baseIndex + relativeOffset, items.length)
 
     return {
@@ -46,7 +78,7 @@ function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
     : 1
 
   const reelStyle: CSSProperties = {
-    transform: `translate3d(0, ${(-rowOffset * ROW_HEIGHT_PX).toFixed(3)}px, 0)`,
+    transform: `translate3d(0, ${(-rowOffset * rowHeightPx).toFixed(3)}px, 0)`,
     filter: isSpinning
       ? `blur(${blurAmount.toFixed(2)}px) brightness(${brightness.toFixed(2)})`
       : undefined,
@@ -60,7 +92,7 @@ function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
           {visibleRows.map(({ item, itemIndex, rowIndex, relativeOffset }) => (
             <li
               key={`${itemIndex}-${relativeOffset}-${baseIndex}-${rowIndex}`}
-              className={rowIndex === ACTIVE_ROW_INDEX ? 'is-active' : ''}
+              className={rowIndex === activeRowIndex ? 'is-active' : ''}
             >
               {item}
             </li>
