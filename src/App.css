@@ -699,6 +699,7 @@ main {
 }
 
 .reel {
+  --reel-row-height: 36px;
   display: grid;
   gap: 0.45rem;
 }
@@ -712,8 +713,9 @@ main {
 }
 
 .reel-window {
-  height: 180px;
+  height: calc(var(--reel-row-height) * 5);
   overflow: hidden;
+  position: relative;
   background: var(--reel-window-bg);
   border: 8px solid var(--reel-border);
   border-top-color: var(--reel-border-light);
@@ -729,10 +731,15 @@ main {
   margin: 0;
   padding: 0;
   list-style: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, filter;
+  backface-visibility: hidden;
 }
 
 .reel-list li {
-  min-height: 36px;
+  height: var(--reel-row-height);
+  min-height: var(--reel-row-height);
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   padding: 0 0.65rem;
@@ -743,6 +750,7 @@ main {
   overflow: hidden;
   white-space: nowrap;
   border-bottom: 1px solid var(--reel-item-divider);
+  transition: color 120ms linear, background-color 120ms linear, text-shadow 120ms linear;
 }
 
 .reel-list li.is-active {
@@ -752,7 +760,7 @@ main {
 }
 
 .reel-list.is-spinning {
-  animation: reel-buzz 0.11s linear infinite;
+  will-change: transform, filter;
 }
 
 .chaos-reels {
@@ -814,12 +822,14 @@ main {
   z-index: 3;
 }
 
-@keyframes reel-buzz {
-  from {
-    transform: translateY(0);
+@media (prefers-reduced-motion: reduce) {
+  .reel-list {
+    filter: none !important;
+    will-change: auto;
   }
-  to {
-    transform: translateY(-18px);
+
+  .reel-list li {
+    transition: none;
   }
 }
 
@@ -836,7 +846,4 @@ main {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .reel-window {
-    height: 210px;
-  }
 }

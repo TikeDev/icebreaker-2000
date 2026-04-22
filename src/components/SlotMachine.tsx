@@ -14,22 +14,116 @@ interface SlotMachineProps {
   onDarkToggle: () => void
 }
 
-const SAFE_MIN_STEPS = 24
-const SAFE_EXTRA_STEPS = 20
-const SAFE_MIN_DELAY = 45
-const SAFE_MAX_DELAY = 280
-
 type ChaosReelKey = 'opener' | 'descriptor' | 'topic'
-const CHAOS_REEL_KEYS: ChaosReelKey[] = ['opener', 'descriptor', 'topic']
+type ReelKey = 'safe' | ChaosReelKey
 
-const CHAOS_MIN_STEPS: Record<ChaosReelKey, number> = {
-  opener: 24,
-  descriptor: 40,
-  topic: 56,
+const CHAOS_REEL_KEYS: ChaosReelKey[] = ['opener', 'descriptor', 'topic']
+const ALL_REEL_KEYS: ReelKey[] = ['safe', ...CHAOS_REEL_KEYS]
+
+const SAFE_SPIN_DURATION_MS = 2200
+const SAFE_SPIN_DURATION_JITTER_MS = 280
+const SAFE_DISTANCE_MIN = 34
+const SAFE_DISTANCE_MAX = 54
+
+const CHAOS_SPIN_DURATION_MS = 1980
+const CHAOS_SPIN_DURATION_JITTER_MS = 220
+const CHAOS_STOP_STAGGER_MS: Record<ChaosReelKey, number> = {
+  opener: 0,
+  descriptor: 180,
+  topic: 360,
 }
-const CHAOS_EXTRA_STEPS = 6
-const CHAOS_MIN_DELAY = 45
-const CHAOS_MAX_DELAY = 280
+const CHAOS_DISTANCE_RANGES: Record<ChaosReelKey, { min: number; max: number }> = {
+  opener: { min: 36, max: 54 },
+  descriptor: { min: 44, max: 62 },
+  topic: { min: 52, max: 72 },
+}
+
+const REDUCED_SPIN_DURATION_MS = 300
+const REDUCED_CHAOS_STAGGER_MS: Record<ChaosReelKey, number> = {
+  opener: 0,
+  descriptor: 50,
+  topic: 100,
+}
+const REDUCED_SAFE_DISTANCE_MIN = 8
+const REDUCED_SAFE_DISTANCE_MAX = 14
+const REDUCED_CHAOS_DISTANCE_RANGES: Record<ChaosReelKey, { min: number; max: number }> = {
+  opener: { min: 8, max: 12 },
+  descriptor: { min: 9, max: 13 },
+  topic: { min: 10, max: 14 },
+}
+
+const PROFILE_ACCEL_PORTION = 0.2
+const PROFILE_CRUISE_PORTION = 0.45
+const PROFILE_DECEL_PORTION = 0.35
+
+const PROFILE_PEAK_SPEED =
+  1 /
+  (0.5 * PROFILE_ACCEL_PORTION +
+    PROFILE_CRUISE_PORTION +
+    0.5 * PROFILE_DECEL_PORTION)
+
+const PROFILE_ACCEL_DISTANCE =
+  0.5 * PROFILE_PEAK_SPEED * PROFILE_ACCEL_PORTION
+const PROFILE_CRUISE_DISTANCE = PROFILE_PEAK_SPEED * PROFILE_CRUISE_PORTION
+const PROFILE_DECEL_DISTANCE =
+  0.5 * PROFILE_PEAK_SPEED * PROFILE_DECEL_PORTION
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
+const modulo = (value: number, divisor: number) => {
+  const remainder = value % divisor
+  return remainder < 0 ? remainder + divisor : remainder
+}
+
+const randomInt = (min: number, max: number) =>
+  min + Math.floor(Math.random() * (max - min + 1))
+
+const getSpinProgress = (progress: number) => {
+  const normalized = clamp(progress, 0, 1)
+
+  if (normalized <= PROFILE_ACCEL_PORTION) {
+    const phaseProgress = normalized / PROFILE_ACCEL_PORTION
+    return PROFILE_ACCEL_DISTANCE * phaseProgress * phaseProgress
+  }
+
+  if (normalized <= PROFILE_ACCEL_PORTION + PROFILE_CRUISE_PORTION) {
+    const phaseProgress =
+      (normalized - PROFILE_ACCEL_PORTION) / PROFILE_CRUISE_PORTION
+    return PROFILE_ACCEL_DISTANCE + PROFILE_CRUISE_DISTANCE * phaseProgress
+  }
+
+  const phaseProgress =
+    (normalized - PROFILE_ACCEL_PORTION - PROFILE_CRUISE_PORTION) /
+    PROFILE_DECEL_PORTION
+
+  return (
+    PROFILE_ACCEL_DISTANCE +
+    PROFILE_CRUISE_DISTANCE +
+    PROFILE_DECEL_DISTANCE * (1 - (1 - phaseProgress) * (1 - phaseProgress))
+  )
+}
+
+const getSpinVelocityFactor = (progress: number) => {
+  const normalized = clamp(progress, 0, 1)
+
+  if (normalized <= PROFILE_ACCEL_PORTION) {
+    const phaseProgress = normalized / PROFILE_ACCEL_PORTION
+    return (2 * PROFILE_ACCEL_DISTANCE * phaseProgress) / PROFILE_ACCEL_PORTION
+  }
+
+  if (normalized <= PROFILE_ACCEL_PORTION + PROFILE_CRUISE_PORTION) {
+    return PROFILE_CRUISE_DISTANCE / PROFILE_CRUISE_PORTION
+  }
+
+  const phaseProgress =
+    (normalized - PROFILE_ACCEL_PORTION - PROFILE_CRUISE_PORTION) /
+    PROFILE_DECEL_PORTION
+
+  return (
+    (2 * PROFILE_DECEL_DISTANCE * (1 - phaseProgress)) / PROFILE_DECEL_PORTION
+  )
+}
 
 function SlotMachine({
   selectedPalette,
@@ -37,30 +131,55 @@ function SlotMachine({
   onPaletteCycle,
   onDarkToggle,
 }: SlotMachineProps) {
-  const [mode, setMode] = useState<SlotMode>('safe')
-  const [safeIndex, setSafeIndex] = useState<number>(() =>
-    Math.floor(Math.random() * questions.length),
-  )
-  const [openerIndex, setOpenerIndex] = useState<number>(() =>
-    Math.floor(Math.random() * chaos.openers.length),
-  )
-  const [descriptorIndex, setDescriptorIndex] = useState<number>(() =>
+  const initialSafeIndexRef = useRef(Math.floor(Math.random() * questions.length))
+  const initialOpenerIndexRef = useRef(Math.floor(Math.random() * chaos.openers.length))
+  const initialDescriptorIndexRef = useRef(
     Math.floor(Math.random() * chaos.descriptors.length),
   )
-  const [topicIndex, setTopicIndex] = useState<number>(() =>
-    Math.floor(Math.random() * chaos.topics.length),
+  const initialTopicIndexRef = useRef(Math.floor(Math.random() * chaos.topics.length))
+
+  const [mode, setMode] = useState<SlotMode>('safe')
+  const [safeIndex, setSafeIndex] = useState<number>(initialSafeIndexRef.current)
+  const [openerIndex, setOpenerIndex] = useState<number>(initialOpenerIndexRef.current)
+  const [descriptorIndex, setDescriptorIndex] = useState<number>(
+    initialDescriptorIndexRef.current,
   )
+  const [topicIndex, setTopicIndex] = useState<number>(initialTopicIndexRef.current)
+
+  const [safeReelPosition, setSafeReelPosition] = useState<number>(
+    initialSafeIndexRef.current,
+  )
+  const [openerReelPosition, setOpenerReelPosition] = useState<number>(
+    initialOpenerIndexRef.current,
+  )
+  const [descriptorReelPosition, setDescriptorReelPosition] = useState<number>(
+    initialDescriptorIndexRef.current,
+  )
+  const [topicReelPosition, setTopicReelPosition] = useState<number>(
+    initialTopicIndexRef.current,
+  )
+
+  const [safeSpinVelocity, setSafeSpinVelocity] = useState(0)
+  const [openerSpinVelocity, setOpenerSpinVelocity] = useState(0)
+  const [descriptorSpinVelocity, setDescriptorSpinVelocity] = useState(0)
+  const [topicSpinVelocity, setTopicSpinVelocity] = useState(0)
+
   const [isSpinning, setIsSpinning] = useState(false)
   const [isOpenerSpinning, setIsOpenerSpinning] = useState(false)
   const [isDescriptorSpinning, setIsDescriptorSpinning] = useState(false)
   const [isTopicSpinning, setIsTopicSpinning] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
-  const [displayText, setDisplayText] = useState(questions[safeIndex])
+  const [displayText, setDisplayText] = useState(questions[initialSafeIndexRef.current])
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return false
+    }
 
-  const safeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const chaosTimeoutRefs = useRef<
-    Record<ChaosReelKey, ReturnType<typeof setTimeout> | null>
-  >({
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  })
+
+  const reelAnimationRefs = useRef<Record<ReelKey, number | null>>({
+    safe: null,
     opener: null,
     descriptor: null,
     topic: null,
@@ -75,32 +194,45 @@ function SlotMachine({
 
   const chaosPreviewText = `${chaosPreview.opener} ${chaosPreview.descriptor} ${chaosPreview.topic}?`
 
-  const clearAllSpinTimeouts = () => {
-    if (safeTimeoutRef.current) {
-      clearTimeout(safeTimeoutRef.current)
-      safeTimeoutRef.current = null
-    }
-
-    CHAOS_REEL_KEYS.forEach((reelKey) => {
-      const reelTimeout = chaosTimeoutRefs.current[reelKey]
-      if (!reelTimeout) {
+  const clearAllSpinAnimations = () => {
+    ALL_REEL_KEYS.forEach((reelKey) => {
+      const frameId = reelAnimationRefs.current[reelKey]
+      if (frameId === null) {
         return
       }
 
-      clearTimeout(reelTimeout)
-      chaosTimeoutRefs.current[reelKey] = null
+      cancelAnimationFrame(frameId)
+      reelAnimationRefs.current[reelKey] = null
     })
   }
 
   const beginSpinSession = () => {
     spinSessionRef.current += 1
-    clearAllSpinTimeouts()
+    clearAllSpinAnimations()
     return spinSessionRef.current
   }
 
   useEffect(() => {
     return () => {
       beginSpinSession()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return
+    }
+
+    const mediaQueryList = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const handleChange = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
+    }
+
+    setPrefersReducedMotion(mediaQueryList.matches)
+    mediaQueryList.addEventListener('change', handleChange)
+
+    return () => {
+      mediaQueryList.removeEventListener('change', handleChange)
     }
   }, [])
 
@@ -115,6 +247,58 @@ function SlotMachine({
     }
   }, [mode, safeIndex, chaosPreviewText, isSpinning])
 
+  const startReelAnimation = ({
+    reelKey,
+    startIndex,
+    totalItems,
+    distance,
+    durationMs,
+    spinSessionId,
+    onFrame,
+    onComplete,
+  }: {
+    reelKey: ReelKey
+    startIndex: number
+    totalItems: number
+    distance: number
+    durationMs: number
+    spinSessionId: number
+    onFrame: (position: number, velocityItemsPerSecond: number) => void
+    onComplete: (finalIndex: number) => void
+  }) => {
+    const safeDurationMs = Math.max(durationMs, 1)
+    const animationStart = performance.now()
+
+    const animate = (now: number) => {
+      if (spinSessionRef.current !== spinSessionId) {
+        reelAnimationRefs.current[reelKey] = null
+        return
+      }
+
+      const elapsedMs = now - animationStart
+      const progress = clamp(elapsedMs / safeDurationMs, 0, 1)
+      const distanceProgress = getSpinProgress(progress)
+      const position = startIndex + distance * distanceProgress
+      const velocityItemsPerSecond =
+        ((distance / safeDurationMs) * getSpinVelocityFactor(progress)) * 1000
+
+      onFrame(position, velocityItemsPerSecond)
+
+      if (progress < 1) {
+        reelAnimationRefs.current[reelKey] = requestAnimationFrame(animate)
+        return
+      }
+
+      const finalPosition = startIndex + distance
+      const finalIndex = modulo(finalPosition, totalItems)
+      onFrame(finalPosition, 0)
+      onComplete(finalIndex)
+      reelAnimationRefs.current[reelKey] = null
+    }
+
+    reelAnimationRefs.current[reelKey] = requestAnimationFrame(animate)
+  }
+
   const startSafeSpin = () => {
     if (isSpinning) {
       return
@@ -122,91 +306,38 @@ function SlotMachine({
 
     const spinSessionId = beginSpinSession()
     setIsSpinning(true)
-    const totalItems = questions.length
-    const finalIndex = Math.floor(Math.random() * totalItems)
-    const loopOffset = (finalIndex - safeIndex + totalItems) % totalItems
-    const totalSteps =
-      SAFE_MIN_STEPS + Math.floor(Math.random() * SAFE_EXTRA_STEPS) + loopOffset
 
-    let step = 0
-    let cursor = safeIndex
+    const distance = prefersReducedMotion
+      ? randomInt(REDUCED_SAFE_DISTANCE_MIN, REDUCED_SAFE_DISTANCE_MAX)
+      : randomInt(SAFE_DISTANCE_MIN, SAFE_DISTANCE_MAX)
 
-    const spinStep = () => {
-      if (spinSessionRef.current !== spinSessionId) {
-        return
-      }
+    const durationMs = prefersReducedMotion
+      ? REDUCED_SPIN_DURATION_MS
+      : SAFE_SPIN_DURATION_MS +
+        randomInt(-SAFE_SPIN_DURATION_JITTER_MS, SAFE_SPIN_DURATION_JITTER_MS)
 
-      step += 1
-      cursor = (cursor + 1) % totalItems
-      setSafeIndex(cursor)
-      setDisplayText(questions[cursor])
+    startReelAnimation({
+      reelKey: 'safe',
+      startIndex: safeIndex,
+      totalItems: questions.length,
+      distance,
+      durationMs,
+      spinSessionId,
+      onFrame: (position, velocity) => {
+        setSafeReelPosition(position)
+        setSafeSpinVelocity(velocity)
+      },
+      onComplete: (finalIndex) => {
+        if (spinSessionRef.current !== spinSessionId) {
+          return
+        }
 
-      if (step < totalSteps) {
-        const progress = step / totalSteps
-        const easedProgress = progress * progress
-        const delay = Math.round(
-          SAFE_MIN_DELAY + (SAFE_MAX_DELAY - SAFE_MIN_DELAY) * easedProgress,
-        )
-        safeTimeoutRef.current = setTimeout(spinStep, delay)
-        return
-      }
-
-      setIsSpinning(false)
-      safeTimeoutRef.current = null
-    }
-
-    spinStep()
-  }
-
-  const startChaosReelSpin = ({
-    reelKey,
-    startIndex,
-    totalItems,
-    minSteps,
-    onStep,
-    onComplete,
-    spinSessionId,
-  }: {
-    reelKey: ChaosReelKey
-    startIndex: number
-    totalItems: number
-    minSteps: number
-    onStep: (index: number) => void
-    onComplete: () => void
-    spinSessionId: number
-  }) => {
-    const finalIndex = Math.floor(Math.random() * totalItems)
-    const loopOffset = (finalIndex - startIndex + totalItems) % totalItems
-    const totalSteps =
-      minSteps + Math.floor(Math.random() * CHAOS_EXTRA_STEPS) + loopOffset
-
-    let step = 0
-    let cursor = startIndex
-
-    const spinStep = () => {
-      if (spinSessionRef.current !== spinSessionId) {
-        return
-      }
-
-      step += 1
-      cursor = (cursor + 1) % totalItems
-      onStep(cursor)
-
-      if (step < totalSteps) {
-        const progress = step / totalSteps
-        const easedProgress = progress * progress
-        const delay = Math.round(
-          CHAOS_MIN_DELAY + (CHAOS_MAX_DELAY - CHAOS_MIN_DELAY) * easedProgress,
-        )
-        chaosTimeoutRefs.current[reelKey] = setTimeout(spinStep, delay)
-        return
-      }
-
-      chaosTimeoutRefs.current[reelKey] = null
-      onComplete()
-    }
-
-    spinStep()
+        setSafeIndex(finalIndex)
+        setSafeReelPosition(finalIndex)
+        setSafeSpinVelocity(0)
+        setIsSpinning(false)
+      },
+    })
   }
 
   const startChaosSpin = () => {
@@ -237,39 +368,87 @@ function SlotMachine({
 
       completedReels += 1
 
-      if (completedReels === 3) {
+      if (completedReels === CHAOS_REEL_KEYS.length) {
         setIsSpinning(false)
       }
     }
 
-    startChaosReelSpin({
+    const spinChaosReel = ({
+      reelKey,
+      startIndex,
+      totalItems,
+      onPosition,
+      onVelocity,
+      onIndex,
+    }: {
+      reelKey: ChaosReelKey
+      startIndex: number
+      totalItems: number
+      onPosition: (position: number) => void
+      onVelocity: (velocity: number) => void
+      onIndex: (index: number) => void
+    }) => {
+      const range = prefersReducedMotion
+        ? REDUCED_CHAOS_DISTANCE_RANGES[reelKey]
+        : CHAOS_DISTANCE_RANGES[reelKey]
+
+      const distance = randomInt(range.min, range.max)
+
+      const durationMs = prefersReducedMotion
+        ? REDUCED_SPIN_DURATION_MS + REDUCED_CHAOS_STAGGER_MS[reelKey]
+        : CHAOS_SPIN_DURATION_MS +
+          randomInt(-CHAOS_SPIN_DURATION_JITTER_MS, CHAOS_SPIN_DURATION_JITTER_MS) +
+          CHAOS_STOP_STAGGER_MS[reelKey]
+
+      startReelAnimation({
+        reelKey,
+        startIndex,
+        totalItems,
+        distance,
+        durationMs,
+        spinSessionId,
+        onFrame: (position, velocity) => {
+          onPosition(position)
+          onVelocity(velocity)
+        },
+        onComplete: (finalIndex) => {
+          if (spinSessionRef.current !== spinSessionId) {
+            return
+          }
+
+          onIndex(finalIndex)
+          onPosition(finalIndex)
+          onVelocity(0)
+          markComplete(reelKey)
+        },
+      })
+    }
+
+    spinChaosReel({
       reelKey: 'opener',
       startIndex: openerIndex,
       totalItems: chaos.openers.length,
-      minSteps: CHAOS_MIN_STEPS.opener,
-      onStep: setOpenerIndex,
-      onComplete: () => markComplete('opener'),
-      spinSessionId,
+      onPosition: setOpenerReelPosition,
+      onVelocity: setOpenerSpinVelocity,
+      onIndex: setOpenerIndex,
     })
 
-    startChaosReelSpin({
+    spinChaosReel({
       reelKey: 'descriptor',
       startIndex: descriptorIndex,
       totalItems: chaos.descriptors.length,
-      minSteps: CHAOS_MIN_STEPS.descriptor,
-      onStep: setDescriptorIndex,
-      onComplete: () => markComplete('descriptor'),
-      spinSessionId,
+      onPosition: setDescriptorReelPosition,
+      onVelocity: setDescriptorSpinVelocity,
+      onIndex: setDescriptorIndex,
     })
 
-    startChaosReelSpin({
+    spinChaosReel({
       reelKey: 'topic',
       startIndex: topicIndex,
       totalItems: chaos.topics.length,
-      minSteps: CHAOS_MIN_STEPS.topic,
-      onStep: setTopicIndex,
-      onComplete: () => markComplete('topic'),
-      spinSessionId,
+      onPosition: setTopicReelPosition,
+      onVelocity: setTopicSpinVelocity,
+      onIndex: setTopicIndex,
     })
   }
 
@@ -318,28 +497,32 @@ function SlotMachine({
       {mode === 'safe' ? (
         <Reel
           items={questions}
-          displayValue={questions[safeIndex]}
+          position={safeReelPosition}
           isSpinning={isSpinning}
+          spinVelocity={safeSpinVelocity}
           label="Safe Reel"
         />
       ) : (
         <div className="chaos-reels">
           <Reel
             items={chaos.openers}
-            displayValue={chaos.openers[openerIndex]}
+            position={openerReelPosition}
             isSpinning={isOpenerSpinning}
+            spinVelocity={openerSpinVelocity}
             label="Opener"
           />
           <Reel
             items={chaos.descriptors}
-            displayValue={chaos.descriptors[descriptorIndex]}
+            position={descriptorReelPosition}
             isSpinning={isDescriptorSpinning}
+            spinVelocity={descriptorSpinVelocity}
             label="Descriptor"
           />
           <Reel
             items={chaos.topics}
-            displayValue={chaos.topics[topicIndex]}
+            position={topicReelPosition}
             isSpinning={isTopicSpinning}
+            spinVelocity={topicSpinVelocity}
             label="Topic"
           />
         </div>
