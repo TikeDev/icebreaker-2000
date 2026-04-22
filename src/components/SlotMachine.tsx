@@ -4,13 +4,27 @@ import questions from '../questions.json'
 import ModeToggle, { type SlotMode } from './ModeToggle'
 import Reel from './Reel'
 import SpinButton from './SpinButton'
+import ThemeControls from './ThemeControls'
+import type { PaletteId } from '../theme'
+
+interface SlotMachineProps {
+  selectedPalette: PaletteId
+  isDarkMode: boolean
+  onPaletteChange: (palette: PaletteId) => void
+  onDarkToggle: () => void
+}
 
 const SAFE_MIN_STEPS = 24
 const SAFE_EXTRA_STEPS = 20
 const SAFE_MIN_DELAY = 45
 const SAFE_MAX_DELAY = 280
 
-function SlotMachine() {
+function SlotMachine({
+  selectedPalette,
+  isDarkMode,
+  onPaletteChange,
+  onDarkToggle,
+}: SlotMachineProps) {
   const [mode, setMode] = useState<SlotMode>('safe')
   const [safeIndex, setSafeIndex] = useState<number>(() =>
     Math.floor(Math.random() * questions.length),
@@ -98,17 +112,30 @@ function SlotMachine() {
     <section className="machine-panel">
       <div className="panel-top-row">
         <ModeToggle mode={mode} onChange={setMode} disabled={isSpinning} />
-        <button
-          type="button"
-          className="help-button"
-          onClick={() => setShowHelp((current) => !current)}
-          aria-expanded={showHelp}
-          aria-controls="slot-help"
-          aria-label="Show instructions"
-        >
-          ?
-        </button>
+        <div className="help-control">
+          <button
+            type="button"
+            className="help-button"
+            onClick={() => setShowHelp((current) => !current)}
+            aria-expanded={showHelp}
+            aria-controls="slot-help"
+            aria-label="Show instructions"
+          >
+            ?
+          </button>
+          {showHelp ? (
+            <p className="help-popover" id="slot-help">
+              Spin to get a question. Ask it to a stranger.
+            </p>
+          ) : null}
+        </div>
       </div>
+      <ThemeControls
+        selectedPalette={selectedPalette}
+        isDarkMode={isDarkMode}
+        onPaletteChange={onPaletteChange}
+        onDarkToggle={onDarkToggle}
+      />
 
       {mode === 'safe' ? (
         <Reel
@@ -145,12 +172,6 @@ function SlotMachine() {
       </div>
 
       <SpinButton onSpin={handleSpin} disabled={isSpinning} />
-
-      {showHelp ? (
-        <p className="help-popover" id="slot-help">
-          Spin to get a question. Ask it to a stranger.
-        </p>
-      ) : null}
     </section>
   )
 }
