@@ -1,54 +1,48 @@
-import { isPaletteId, PALETTE_IDS, type PaletteId } from '../theme'
+import type { PaletteId } from '../theme'
+import moonIcon from 'pixelarticons/svg/moon.svg?raw'
+import sunIcon from 'pixelarticons/svg/sun.svg?raw'
 
 interface ThemeControlsProps {
   selectedPalette: PaletteId
   isDarkMode: boolean
-  onPaletteChange: (palette: PaletteId) => void
+  onPaletteCycle: () => void
   onDarkToggle: () => void
 }
 
-const PALETTE_LABELS: Record<PaletteId, string> = {
-  'art-deco': 'Miami Art Deco',
-  'retro-neon': 'Retro Neon',
-  'classic-vegas': 'Classic Vegas',
+const PALETTE_SHORT_LABELS: Record<PaletteId, string> = {
+  'art-deco': 'MIAMI',
+  'retro-neon': 'RETRO',
+  'classic-vegas': 'VEGAS',
 }
 
 function ThemeControls({
   selectedPalette,
   isDarkMode,
-  onPaletteChange,
+  onPaletteCycle,
   onDarkToggle,
 }: ThemeControlsProps) {
   return (
     <div className="theme-controls">
-      <label className="theme-label" htmlFor="palette-select">
-        Palette
-      </label>
-      <select
-        id="palette-select"
-        className="theme-select"
-        value={selectedPalette}
-        onChange={(event) => {
-          const nextPalette = event.target.value
-          if (isPaletteId(nextPalette)) {
-            onPaletteChange(nextPalette)
-          }
-        }}
-        aria-label="Choose color palette"
-      >
-        {PALETTE_IDS.map((paletteId) => (
-          <option key={paletteId} value={paletteId}>
-            {PALETTE_LABELS[paletteId]}
-          </option>
-        ))}
-      </select>
       <button
         type="button"
-        className="theme-dark-toggle"
+        className="theme-cycle-button"
+        onClick={onPaletteCycle}
+        aria-label={`Cycle palette. Current palette: ${PALETTE_SHORT_LABELS[selectedPalette]}.`}
+      >
+        PALETTE: <span>{PALETTE_SHORT_LABELS[selectedPalette]}</span>
+      </button>
+      <button
+        type="button"
+        className="theme-icon-toggle"
         onClick={onDarkToggle}
         aria-pressed={isDarkMode}
+        aria-label={isDarkMode ? 'Enable light mode' : 'Enable dark mode'}
       >
-        DARK: <span>{isDarkMode ? 'ON' : 'OFF'}</span>
+        <span
+          className="theme-icon"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: isDarkMode ? sunIcon : moonIcon }}
+        />
       </button>
     </div>
   )

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      pixelarticons:
+        specifier: ^1.8.1
+        version: 1.8.2
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -1684,6 +1687,9 @@ packages:
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
+
+  pixelarticons@1.8.2:
+    resolution: {integrity: sha512-KCPRDCPq4ZzY2NQfVqQQo7lWWQxxoRudocRLMQVunfYBQmKye8enTY6tP92rdZKcUAhQTqdgr7m9NXT/ZYHtgg==}
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -3923,6 +3929,8 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.4: {}
+
+  pixelarticons@1.8.2: {}
 
   possible-typed-array-names@1.1.0: {}
 

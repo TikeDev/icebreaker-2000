@@ -9,6 +9,12 @@ import {
 } from './theme'
 import { useEffect, useState } from 'react'
 
+const PALETTE_CYCLE_ORDER: PaletteId[] = [
+  'retro-neon',
+  'art-deco',
+  'classic-vegas',
+]
+
 function App() {
   const [palette, setPalette] = useState<PaletteId>(readStoredPalette)
   const [themeMode, setThemeMode] = useState<ThemeMode>(readStoredThemeMode)
@@ -26,6 +32,19 @@ function App() {
     setThemeMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'))
   }
 
+  const handlePaletteCycle = () => {
+    setPalette((currentPalette) => {
+      const currentIndex = PALETTE_CYCLE_ORDER.indexOf(currentPalette)
+
+      if (currentIndex < 0) {
+        return PALETTE_CYCLE_ORDER[0]
+      }
+
+      const nextIndex = (currentIndex + 1) % PALETTE_CYCLE_ORDER.length
+      return PALETTE_CYCLE_ORDER[nextIndex]
+    })
+  }
+
   return (
     <div className="app-root" data-palette={palette} data-theme-mode={themeMode}>
       <div className="app-shell">
@@ -39,7 +58,7 @@ function App() {
           <SlotMachine
             selectedPalette={palette}
             isDarkMode={isDarkMode}
-            onPaletteChange={setPalette}
+            onPaletteCycle={handlePaletteCycle}
             onDarkToggle={handleDarkModeToggle}
           />
         </main>

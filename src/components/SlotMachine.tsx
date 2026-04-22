@@ -10,7 +10,7 @@ import type { PaletteId } from '../theme'
 interface SlotMachineProps {
   selectedPalette: PaletteId
   isDarkMode: boolean
-  onPaletteChange: (palette: PaletteId) => void
+  onPaletteCycle: () => void
   onDarkToggle: () => void
 }
 
@@ -22,7 +22,7 @@ const SAFE_MAX_DELAY = 280
 function SlotMachine({
   selectedPalette,
   isDarkMode,
-  onPaletteChange,
+  onPaletteCycle,
   onDarkToggle,
 }: SlotMachineProps) {
   const [mode, setMode] = useState<SlotMode>('safe')
@@ -133,7 +133,7 @@ function SlotMachine({
       <ThemeControls
         selectedPalette={selectedPalette}
         isDarkMode={isDarkMode}
-        onPaletteChange={onPaletteChange}
+        onPaletteCycle={onPaletteCycle}
         onDarkToggle={onDarkToggle}
       />
 
