@@ -566,6 +566,21 @@ main {
   flex: 1;
 }
 
+.app-footer {
+  padding: clamp(0.18rem, 0.7vh, 0.4rem) clamp(0.2rem, 0.8vw, 0.5rem);
+}
+
+.app-footer p, .app-footer p a {
+  margin: 0;
+  text-align: center;
+  color: var(--title-subtitle);
+  font-size: clamp(0.64rem, 1.6vh, 0.875rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.app-footer p a { text-decoration: none; font-weight: 600; }
+
 .machine-panel {
   border: 8px solid var(--chrome-border);
   border-top-color: var(--chrome-border-light);

@@ -62,6 +62,10 @@ function App() {
             onDarkToggle={handleDarkModeToggle}
           />
         </main>
+
+        <footer className="app-footer">
+          <p>Created by <a href="https://kerlinemoncy.carrd.co/" target="_blank">Kerline Moncy</a> at the Miami&nbsp;Frontier&nbsp;Tech&nbsp;Week&nbsp;Hackathon&nbsp;2026</p>
+        </footer>
       </div>
     </div>
   )
