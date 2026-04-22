@@ -15,7 +15,6 @@ function ModeToggle({ mode, onChange, disabled }: ModeToggleProps) {
       className="mode-toggle"
       onClick={() => onChange(nextMode)}
       disabled={disabled}
-      aria-label={`Switch mode. Current mode is ${mode}.`}
     >
       SAFE / CHAOS: <span>{mode === 'safe' ? 'SAFE' : 'CHAOS'}</span>
     </button>

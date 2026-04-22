@@ -1,5 +1,12 @@
 :root {
-  font-family: 'Press Start 2P', cursive;
+  --font-display: 'Press Start 2P', cursive;
+  --font-readable:
+    'Segoe UI',
+    'Avenir Next',
+    'Helvetica Neue',
+    'Noto Sans',
+    Arial,
+    sans-serif;
 }
 
 * {
@@ -7,6 +14,7 @@
 }
 
 body {
+  font-family: var(--font-readable);
   margin: 0;
   min-height: 100vh;
   background: #080808;
@@ -530,12 +538,14 @@ body {
 
 .title-kicker {
   margin: 0 0 0.7rem;
-  font-size: 0.54rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
   color: var(--title-kicker);
-  letter-spacing: 0.07em;
+  letter-spacing: 0.045em;
 }
 
 .title-chrome h1 {
+  font-family: var(--font-display);
   margin: 0;
   color: var(--title-main);
   font-size: clamp(1.08rem, 6vw, 2rem);
@@ -548,7 +558,7 @@ body {
 .title-subtitle {
   margin: 0.9rem 0 0;
   color: var(--title-subtitle);
-  font-size: 0.5rem;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 
@@ -614,8 +624,8 @@ main {
 .mode-toggle {
   min-height: 52px;
   background: linear-gradient(180deg, var(--mode-bg-start), var(--mode-bg-end));
-  font-size: 0.42rem;
-  line-height: 1.3;
+  font-size: 0.875rem;
+  line-height: 1.45;
   padding: 0.48rem 0.58rem;
   text-align: center;
   white-space: nowrap;
@@ -626,6 +636,7 @@ main {
 }
 
 .help-button {
+  font-family: var(--font-display);
   width: 52px;
   min-width: 52px;
   min-height: 52px;
@@ -646,8 +657,8 @@ main {
   min-height: 48px;
   background: var(--theme-select-bg);
   color: var(--theme-select-text);
-  font-size: 0.42rem;
-  line-height: 1.25;
+  font-size: 0.875rem;
+  line-height: 1.45;
   padding: 0.48rem 0.62rem;
   white-space: nowrap;
   text-align: left;
@@ -706,10 +717,11 @@ main {
 
 .reel-label {
   margin: 0;
-  font-size: 0.46rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
   color: var(--reel-label);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .reel-window {
@@ -744,8 +756,8 @@ main {
   align-items: center;
   padding: 0 0.65rem;
   color: var(--reel-item-text);
-  font-size: 0.42rem;
-  line-height: 1.4;
+  font-size: 0.875rem;
+  line-height: 1.45;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -783,7 +795,7 @@ main {
   place-items: center;
   text-align: center;
   line-height: 1.7;
-  font-size: clamp(0.62rem, 2.9vw, 1rem);
+  font-size: clamp(0.875rem, 2.9vw, 1rem);
   padding: 0.9rem;
   color: var(--display-text);
   text-shadow:
@@ -792,6 +804,7 @@ main {
 }
 
 .spin-button {
+  font-family: var(--font-display);
   min-height: 72px;
   font-size: clamp(1rem, 7vw, 1.35rem);
   letter-spacing: 0.08em;
@@ -809,7 +822,7 @@ main {
 
 .help-popover {
   margin: 0;
-  font-size: 0.5rem;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--popover-text);
   background: var(--popover-bg);

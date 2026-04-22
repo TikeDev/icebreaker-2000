@@ -3,3 +3,4 @@ set -e
 
 pnpm lint
 pnpm build
+pnpm a11y:readability

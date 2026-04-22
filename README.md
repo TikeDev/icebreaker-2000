@@ -22,6 +22,7 @@ pnpm dev
 pnpm build
 pnpm preview
 pnpm lint
+pnpm a11y:readability
 pnpm typecheck
 pnpm prepare
 ```
@@ -84,6 +85,7 @@ src/
 - Husky pre-commit hook runs:
   - `pnpm lint`
   - `pnpm build`
+  - `pnpm a11y:readability`
 - Hook script location: `.husky/pre-commit`
 
 ## UX Notes
