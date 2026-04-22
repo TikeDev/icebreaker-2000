@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="84" fill="#2d0000" />
+  <rect
+    x="48"
+    y="48"
+    width="416"
+    height="416"
+    rx="56"
+    fill="#5d0404"
+    stroke="#d5a028"
+    stroke-width="24"
+  />
+  <rect
+    x="110"
+    y="176"
+    width="292"
+    height="160"
+    rx="22"
+    fill="#120b0b"
+    stroke="#ffd67a"
+    stroke-width="12"
+  />
+  <text
+    x="256"
+    y="245"
+    text-anchor="middle"
+    fill="#fffbe2"
+    font-family="monospace"
+    font-size="40"
+    font-weight="700"
+  >
+    ICE
+  </text>
+  <text
+    x="256"
+    y="302"
+    text-anchor="middle"
+    fill="#fff176"
+    font-family="monospace"
+    font-size="40"
+    font-weight="700"
+  >
+    2000
+  </text>
+</svg>

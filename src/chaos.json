@@ -1,0 +1,38 @@
+{
+  "openers": [
+    "What is the most",
+    "Have you ever picked the",
+    "Would you rather defend the",
+    "Tell me about the",
+    "What is one surprisingly",
+    "When was the last time you shipped a",
+    "How did you end up with the",
+    "What is your hottest take on the",
+    "What is the least expected",
+    "What should everyone avoid in the"
+  ],
+  "descriptors": [
+    "embarrassing",
+    "underrated",
+    "chaotic",
+    "surprisingly legal",
+    "questionable",
+    "overpowered",
+    "mildly cursed",
+    "unexpectedly wholesome",
+    "high-risk",
+    "legendary"
+  ],
+  "topics": [
+    "thing at this event",
+    "life decision you have made",
+    "food to eat at 3am",
+    "opinion about AI",
+    "workflow on your laptop",
+    "career detour you almost took",
+    "demo you have seen this week",
+    "engineering hill you will die on",
+    "meeting format in your company",
+    "hackathon strategy for day one"
+  ]
+}
