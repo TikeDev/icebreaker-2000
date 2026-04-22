@@ -574,9 +574,21 @@ main {
 
 .panel-top-row {
   display: flex;
-  gap: 0.7rem;
   align-items: center;
   flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.panel-top-left,
+.panel-top-right {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.panel-top-right {
+  margin-left: auto;
+  justify-content: flex-end;
 }
 
 .help-control {
@@ -625,7 +637,7 @@ main {
 
 .theme-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.55rem;
   align-items: center;
 }

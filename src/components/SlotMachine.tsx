@@ -111,31 +111,35 @@ function SlotMachine({
   return (
     <section className="machine-panel">
       <div className="panel-top-row">
-        <ModeToggle mode={mode} onChange={setMode} disabled={isSpinning} />
-        <div className="help-control">
-          <button
-            type="button"
-            className="help-button"
-            onClick={() => setShowHelp((current) => !current)}
-            aria-expanded={showHelp}
-            aria-controls="slot-help"
-            aria-label="Show instructions"
-          >
-            ?
-          </button>
-          {showHelp ? (
-            <p className="help-popover" id="slot-help">
-              Spin to get a question. Ask it to a stranger.
-            </p>
-          ) : null}
+        <div className="panel-top-left">
+          <ModeToggle mode={mode} onChange={setMode} disabled={isSpinning} />
+          <div className="help-control">
+            <button
+              type="button"
+              className="help-button"
+              onClick={() => setShowHelp((current) => !current)}
+              aria-expanded={showHelp}
+              aria-controls="slot-help"
+              aria-label="Show instructions"
+            >
+              ?
+            </button>
+            {showHelp ? (
+              <p className="help-popover" id="slot-help">
+                Spin to get a question. Ask it to a stranger.
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <div className="panel-top-right">
+          <ThemeControls
+            selectedPalette={selectedPalette}
+            isDarkMode={isDarkMode}
+            onPaletteCycle={onPaletteCycle}
+            onDarkToggle={onDarkToggle}
+          />
         </div>
       </div>
-      <ThemeControls
-        selectedPalette={selectedPalette}
-        isDarkMode={isDarkMode}
-        onPaletteCycle={onPaletteCycle}
-        onDarkToggle={onDarkToggle}
-      />
 
       {mode === 'safe' ? (
         <Reel
