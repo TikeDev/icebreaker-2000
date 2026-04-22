@@ -25,12 +25,12 @@ const SAFE_SPIN_DURATION_JITTER_MS = 280
 const SAFE_DISTANCE_MIN = 34
 const SAFE_DISTANCE_MAX = 54
 
-const CHAOS_SPIN_DURATION_MS = 1980
+const CHAOS_SPIN_DURATION_MS = 2500
 const CHAOS_SPIN_DURATION_JITTER_MS = 220
 const CHAOS_STOP_STAGGER_MS: Record<ChaosReelKey, number> = {
   opener: 0,
-  descriptor: 180,
-  topic: 360,
+  descriptor: 1000,
+  topic: 2200,
 }
 const CHAOS_DISTANCE_RANGES: Record<ChaosReelKey, { min: number; max: number }> = {
   opener: { min: 36, max: 54 },
@@ -41,8 +41,8 @@ const CHAOS_DISTANCE_RANGES: Record<ChaosReelKey, { min: number; max: number }> 
 const REDUCED_SPIN_DURATION_MS = 300
 const REDUCED_CHAOS_STAGGER_MS: Record<ChaosReelKey, number> = {
   opener: 0,
-  descriptor: 50,
-  topic: 100,
+  descriptor: 75,
+  topic: 150,
 }
 const REDUCED_SAFE_DISTANCE_MIN = 8
 const REDUCED_SAFE_DISTANCE_MAX = 14
