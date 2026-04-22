@@ -22,14 +22,14 @@
   />
   <text
     x="256"
-    y="246"
+    y="238"
     text-anchor="middle"
     fill="#fffbe2"
     font-family="monospace"
-    font-size="36"
+    font-size="30"
     font-weight="700"
   >
-    ICE
+    ICEBREAKER
   </text>
   <text
     x="256"
