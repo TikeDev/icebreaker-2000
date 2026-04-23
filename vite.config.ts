@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'IceBreaker 2000',
         short_name: 'IceBreaker 2000',
         description: 'A Y2K slot-machine style icebreaker generator for tech events.',
-        theme_color: '#590000',
+        theme_color: '#2d0000',
         background_color: '#2d0000',
         display: 'standalone',
         start_url: '/',

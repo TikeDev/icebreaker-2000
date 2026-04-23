@@ -15,6 +15,51 @@ const PALETTE_CYCLE_ORDER: PaletteId[] = [
   'classic-vegas',
 ]
 
+const APP_BG_BASE_BY_THEME: Record<PaletteId, Record<ThemeMode, string>> = {
+  'classic-vegas': {
+    light: '#2d0000',
+    dark: '#0d0504',
+  },
+  'art-deco': {
+    light: '#0f2b33',
+    dark: '#07181d',
+  },
+  'retro-neon': {
+    light: '#160d35',
+    dark: '#09051c',
+  },
+}
+
+function setThemeColorMeta(color: string) {
+  let themeColorMeta = document.querySelector('meta[name="theme-color"]')
+
+  if (!themeColorMeta) {
+    themeColorMeta = document.createElement('meta')
+    themeColorMeta.setAttribute('name', 'theme-color')
+    document.head.append(themeColorMeta)
+  }
+
+  themeColorMeta.setAttribute('content', color)
+}
+
+function getFallbackThemeColor(palette: PaletteId, themeMode: ThemeMode) {
+  return APP_BG_BASE_BY_THEME[palette][themeMode]
+}
+
+function resolveLiveThemeColor(palette: PaletteId, themeMode: ThemeMode) {
+  const appRoot = document.querySelector('.app-root')
+
+  if (appRoot) {
+    const liveColor = window.getComputedStyle(appRoot).getPropertyValue('--app-bg-base').trim()
+
+    if (liveColor) {
+      return liveColor
+    }
+  }
+
+  return getFallbackThemeColor(palette, themeMode)
+}
+
 function App() {
   const [palette, setPalette] = useState<PaletteId>(readStoredPalette)
   const [themeMode, setThemeMode] = useState<ThemeMode>(readStoredThemeMode)
@@ -71,6 +116,10 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(THEME_STORAGE_KEYS.dark, String(isDarkMode))
   }, [isDarkMode])
+
+  useEffect(() => {
+    setThemeColorMeta(resolveLiveThemeColor(palette, themeMode))
+  }, [palette, themeMode])
 
   useLayoutEffect(() => {
     measureFooterFirstLine()

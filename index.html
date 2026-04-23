@@ -4,7 +4,49 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#590000" />
+    <meta name="theme-color" content="#2d0000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <script>
+      (() => {
+        const APP_BG_BASE_BY_THEME = {
+          'classic-vegas': { light: '#2d0000', dark: '#0d0504' },
+          'art-deco': { light: '#0f2b33', dark: '#07181d' },
+          'retro-neon': { light: '#160d35', dark: '#09051c' },
+        }
+
+        const paletteStorageKey = 'icebreaker.theme.palette'
+        const darkStorageKey = 'icebreaker.theme.dark'
+        const defaultPalette = 'classic-vegas'
+
+        let storedPalette = null
+        let isDarkMode = false
+
+        try {
+          storedPalette = window.localStorage.getItem(paletteStorageKey)
+          isDarkMode = window.localStorage.getItem(darkStorageKey) === 'true'
+        } catch (_error) {
+          // no-op: use defaults when storage is unavailable
+        }
+
+        const hasPalette =
+          typeof storedPalette === 'string' &&
+          Object.prototype.hasOwnProperty.call(APP_BG_BASE_BY_THEME, storedPalette)
+        const palette = hasPalette ? storedPalette : defaultPalette
+        const mode = isDarkMode ? 'dark' : 'light'
+        const themeColor = APP_BG_BASE_BY_THEME[palette][mode]
+
+        let themeColorMeta = document.querySelector('meta[name="theme-color"]')
+
+        if (!themeColorMeta) {
+          themeColorMeta = document.createElement('meta')
+          themeColorMeta.setAttribute('name', 'theme-color')
+          document.head.append(themeColorMeta)
+        }
+
+        themeColorMeta.setAttribute('content', themeColor)
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
