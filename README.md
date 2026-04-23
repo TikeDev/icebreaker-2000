@@ -1,95 +1,41 @@
 # IceBreaker 2000
 
-IceBreaker 2000 is a static PWA that generates networking prompts with a Vegas slot-machine + Y2K aesthetic.
+IceBreaker 2000 is a slot-machine-style question generator for starting conversations.
+Spin once, get a prompt, and use it as an icebreaker.
 
-- `SAFE` mode is fully implemented as a single-reel spin that decelerates and lands on one question.
-- `CHAOS` mode is fully implemented with 3 independent reels (`Opener`, `Descriptor`, `Topic`) that stop in sequence and compose one prompt.
-- Theme controls are implemented with palette cycling and light/dark mode.
+## How It Works
 
-## Tech Stack
+- `SAFE` mode
+  - Spins one reel and lands on a complete question
+  - Great when you want a straightforward conversation starter
+- `CHAOS` mode
+  - Spins three reels (`Opener`, `Descriptor`, `Topic`)
+  - Combines them into one wild, random prompt
+- Theme controls
+  - Cycle visual palettes
+  - Toggle light/dark mode
 
-- React + Vite
-- TypeScript
-- `pnpm`
-- `vite-plugin-pwa`
-- Raw CSS in `src/App.css` (no Tailwind)
-
-## Commands
+## Quick Start
 
 ```bash
 pnpm install
 pnpm dev
+```
+
+Then open the local URL shown in your terminal (usually `http://localhost:5173`).
+
+Optional:
+
+```bash
 pnpm build
 pnpm preview
-pnpm lint
-pnpm a11y:readability
-pnpm typecheck
-pnpm prepare
 ```
 
-`pnpm prepare` installs Husky hooks for local git workflows.
+## Tech Stack (For Curious Folks)
 
-## Modes
-
-- `SAFE`
-  - Single reel (`questions.json`)
-  - Fast-to-slow deceleration until final question
-- `CHAOS`
-  - Three reels (`openers`, `descriptors`, `topics` from `chaos.json`)
-  - Independent spin state and timeout handling per reel
-  - Staggered stop timing with composed final display text
-
-## Theme System
-
-- Palettes: `classic-vegas`, `art-deco`, `retro-neon`
-- Light/dark mode toggle
-- Palette and theme mode are persisted in `localStorage`
-- Main files:
-  - `src/components/ThemeControls.tsx`
-  - `src/theme.ts`
-
-## Cloudflare Pages Deploy
-
-- Framework preset: `Vite`
-- Build command: `pnpm build`
-- Build output directory: `dist`
-- Node version: use current LTS (Cloudflare default is fine for this project)
-
-## Project Structure
-
-```text
-src/
-  App.tsx
-  App.css
-  main.tsx
-  theme.ts
-  questions.json
-  chaos.json
-  components/
-    SlotMachine.tsx
-    Reel.tsx
-    SpinButton.tsx
-    ModeToggle.tsx
-    ThemeControls.tsx
-```
-
-## PWA Notes
-
-- PWA is configured in `vite.config.ts` via `vite-plugin-pwa`.
-- Registration is configured with `registerType: 'autoUpdate'` and `injectRegister: 'auto'`.
-- Manifest metadata and icons are defined in `vite.config.ts` and sourced from `public/`.
-- Build output includes generated service worker assets in `dist/`.
-
-## Quality Gates
-
-- Husky pre-commit hook runs:
-  - `pnpm lint`
-  - `pnpm build`
-  - `pnpm a11y:readability`
-- Hook script location: `.husky/pre-commit`
-
-## UX Notes
-
-- Mobile-first layout with large tap targets for one-handed use.
-- Help icon (`?`) instruction text:
-  - `Spin to get a question. Ask it to a stranger.`
+- React 19
+- TypeScript
+- Vite
+- `pnpm`
+- `vite-plugin-pwa`
+- Raw CSS (no UI framework)
