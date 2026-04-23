@@ -7,7 +7,7 @@ import {
   type PaletteId,
   type ThemeMode,
 } from './theme'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 const PALETTE_CYCLE_ORDER: PaletteId[] = [
   'retro-neon',
@@ -18,7 +18,51 @@ const PALETTE_CYCLE_ORDER: PaletteId[] = [
 function App() {
   const [palette, setPalette] = useState<PaletteId>(readStoredPalette)
   const [themeMode, setThemeMode] = useState<ThemeMode>(readStoredThemeMode)
+  const [footerFirstLineBounds, setFooterFirstLineBounds] = useState<{ left: number; right: number } | null>(null)
+  const footerCopyRef = useRef<HTMLParagraphElement | null>(null)
+  const footerCopyTextRef = useRef<HTMLSpanElement | null>(null)
   const isDarkMode = themeMode === 'dark'
+
+  const measureFooterFirstLine = useCallback(() => {
+    const footerCopy = footerCopyRef.current
+    const footerCopyText = footerCopyTextRef.current
+
+    if (!footerCopy || !footerCopyText) {
+      return
+    }
+
+    const lineRange = document.createRange()
+    lineRange.selectNodeContents(footerCopyText)
+
+    const textRects = Array.from(lineRange.getClientRects()).filter((rect) => rect.width > 0 && rect.height > 0)
+
+    if (!textRects.length) {
+      setFooterFirstLineBounds(null)
+      return
+    }
+
+    const firstLineTop = Math.min(...textRects.map((rect) => rect.top))
+    const firstLineRects = textRects.filter((rect) => Math.abs(rect.top - firstLineTop) <= 1)
+
+    if (!firstLineRects.length) {
+      setFooterFirstLineBounds(null)
+      return
+    }
+
+    const footerRect = footerCopy.getBoundingClientRect()
+    const measuredLeft = Math.min(...firstLineRects.map((rect) => rect.left)) - footerRect.left
+    const measuredRight = Math.max(...firstLineRects.map((rect) => rect.right)) - footerRect.left
+    const roundedLeft = Number(measuredLeft.toFixed(2))
+    const roundedRight = Number(measuredRight.toFixed(2))
+
+    setFooterFirstLineBounds((previousBounds) => {
+      if (previousBounds && previousBounds.left === roundedLeft && previousBounds.right === roundedRight) {
+        return previousBounds
+      }
+
+      return { left: roundedLeft, right: roundedRight }
+    })
+  }, [])
 
   useEffect(() => {
     window.localStorage.setItem(THEME_STORAGE_KEYS.palette, palette)
@@ -27,6 +71,33 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(THEME_STORAGE_KEYS.dark, String(isDarkMode))
   }, [isDarkMode])
+
+  useLayoutEffect(() => {
+    measureFooterFirstLine()
+
+    const footerCopy = footerCopyRef.current
+
+    if (!footerCopy) {
+      return
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      measureFooterFirstLine()
+    })
+
+    resizeObserver.observe(footerCopy)
+    window.addEventListener('resize', measureFooterFirstLine)
+    document.fonts?.ready.then(() => {
+      measureFooterFirstLine()
+    }).catch(() => {
+      // no-op: first-line bounds are already measured during layout
+    })
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', measureFooterFirstLine)
+    }
+  }, [measureFooterFirstLine])
 
   const handleDarkModeToggle = () => {
     setThemeMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'))
@@ -64,7 +135,29 @@ function App() {
         </main>
 
         <footer className="app-footer">
-          <p>Created by <a href="https://kerlinemoncy.carrd.co/" target="_blank">Kerline Moncy</a> at the Miami&nbsp;Frontier&nbsp;Tech&nbsp;Week&nbsp;Hackathon&nbsp;2026</p>
+          <p ref={footerCopyRef} className="app-footer-copy">
+            {footerFirstLineBounds && (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="app-footer-palm app-footer-palm-left"
+                  style={{ left: `${footerFirstLineBounds.left}px` }}
+                >
+                  🌴{'   '}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="app-footer-palm app-footer-palm-right"
+                  style={{ left: `${footerFirstLineBounds.right}px` }}
+                >
+                  {'   '}🌴
+                </span>
+              </>
+            )}
+            <span ref={footerCopyTextRef}>
+              Created by <a href="https://kerlinemoncy.carrd.co/" target="_blank">Kerline Moncy</a> at the Miami&nbsp;Frontier&nbsp;Tech&nbsp;Week&nbsp;Hackathon&nbsp;2026
+            </span>
+          </p>
         </footer>
       </div>
     </div>

@@ -568,6 +568,7 @@ main {
 
 .app-footer {
   padding: clamp(0.18rem, 0.7vh, 0.4rem) clamp(0.2rem, 0.8vw, 0.5rem);
+  text-align: center;
 }
 
 .app-footer p, .app-footer p a {
@@ -577,6 +578,28 @@ main {
   font-size: clamp(0.7rem, 1.7vh, 0.9375rem);
   line-height: 1.2;
   overflow-wrap: anywhere;
+}
+
+.app-footer-copy {
+  position: relative;
+  display: inline-block;
+  max-width: calc(100% - 2.5em);
+}
+
+.app-footer-palm {
+  position: absolute;
+  top: 0;
+  line-height: inherit;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.app-footer-palm-left {
+  transform: translateX(-100%);
+}
+
+.app-footer-palm-right {
+  transform: translateX(0);
 }
 
 .app-footer p a { text-decoration: none; font-weight: 600; }
