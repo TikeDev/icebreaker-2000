@@ -836,7 +836,6 @@ main {
 }
 
 .help-popover {
-  margin: 0;
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--popover-text);
@@ -845,9 +844,17 @@ main {
   padding: 0.65rem;
   position: absolute;
   top: calc(100% + 0.45rem);
-  right: 0;
+  left: 0;
   width: min(250px, calc(100vw - 3.25rem));
-  z-index: 3;
+  z-index: 12;
+}
+
+.help-popover p {
+  margin: 0;
+}
+
+.help-popover p + p {
+  margin-top: 0.45rem;
 }
 
 @media (max-width: 560px) {
@@ -885,6 +892,17 @@ main {
     min-width: 44px;
     min-height: 44px;
     font-size: 0.9rem;
+  }
+
+  .help-popover {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    left: 0.75rem;
+        width: min(250px, calc(100vw - 1.5rem));
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    z-index: 120;
   }
 
   .theme-controls {

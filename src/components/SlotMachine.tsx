@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react'
 import chaos from '../chaos.json'
 import questions from '../questions.json'
 import ModeToggle, { type SlotMode } from './ModeToggle'
@@ -51,6 +57,12 @@ const REDUCED_CHAOS_DISTANCE_RANGES: Record<ChaosReelKey, { min: number; max: nu
   descriptor: { min: 9, max: 13 },
   topic: { min: 10, max: 14 },
 }
+
+const MOBILE_HELP_BREAKPOINT_PX = 560
+const HELP_VIEWPORT_GUTTER_PX = 12
+const HELP_BUTTON_GAP_PX = 8
+const HELP_MAX_WIDTH_PX = 320
+const HELP_MIN_HEIGHT_PX = 120
 
 const PROFILE_ACCEL_PORTION = 0.2
 const PROFILE_CRUISE_PORTION = 0.45
@@ -169,6 +181,7 @@ function SlotMachine({
   const [isDescriptorSpinning, setIsDescriptorSpinning] = useState(false)
   const [isTopicSpinning, setIsTopicSpinning] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [mobileHelpStyle, setMobileHelpStyle] = useState<CSSProperties>()
   const [displayText, setDisplayText] = useState(questions[initialSafeIndexRef.current])
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
@@ -184,6 +197,7 @@ function SlotMachine({
     descriptor: null,
     topic: null,
   })
+  const helpButtonRef = useRef<HTMLButtonElement | null>(null)
   const spinSessionRef = useRef(0)
 
   const chaosPreview = {
@@ -246,6 +260,62 @@ function SlotMachine({
       setDisplayText(chaosPreviewText)
     }
   }, [mode, safeIndex, chaosPreviewText, isSpinning])
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    if (!showHelp) {
+      setMobileHelpStyle(undefined)
+      return
+    }
+
+    const updateMobileHelpPosition = () => {
+      if (window.innerWidth > MOBILE_HELP_BREAKPOINT_PX) {
+        setMobileHelpStyle(undefined)
+        return
+      }
+
+      const buttonRect = helpButtonRef.current?.getBoundingClientRect()
+      if (!buttonRect) {
+        return
+      }
+
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const width = Math.min(
+        HELP_MAX_WIDTH_PX,
+        Math.max(0, viewportWidth - HELP_VIEWPORT_GUTTER_PX * 2),
+      )
+      const left = clamp(
+        buttonRect.left,
+        HELP_VIEWPORT_GUTTER_PX,
+        Math.max(HELP_VIEWPORT_GUTTER_PX, viewportWidth - HELP_VIEWPORT_GUTTER_PX - width),
+      )
+      const top = Math.max(buttonRect.bottom + HELP_BUTTON_GAP_PX, HELP_VIEWPORT_GUTTER_PX)
+      const maxHeight = Math.max(
+        HELP_MIN_HEIGHT_PX,
+        viewportHeight - top - HELP_VIEWPORT_GUTTER_PX,
+      )
+
+      setMobileHelpStyle({
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+        maxHeight: `${maxHeight}px`,
+      })
+    }
+
+    updateMobileHelpPosition()
+    window.addEventListener('resize', updateMobileHelpPosition)
+    window.addEventListener('scroll', updateMobileHelpPosition, true)
+
+    return () => {
+      window.removeEventListener('resize', updateMobileHelpPosition)
+      window.removeEventListener('scroll', updateMobileHelpPosition, true)
+    }
+  }, [showHelp])
 
   const startReelAnimation = ({
     reelKey,
@@ -468,20 +538,28 @@ function SlotMachine({
           <ModeToggle mode={mode} onChange={setMode} disabled={isSpinning} />
           <div className="help-control">
             <button
+              ref={helpButtonRef}
               type="button"
               className="help-button"
               onClick={() => setShowHelp((current) => !current)}
               aria-expanded={showHelp}
               aria-controls="slot-help"
-              aria-label="Show instructions"
+              aria-label={showHelp ? 'Hide instructions' : 'Show instructions'}
             >
               ?
             </button>
             {showHelp ? (
-              <p className="help-popover" id="slot-help">
-                Spin to get a random question. Ask it to a stranger to break the ice!<br/>
-                <b>CHAOS MODE:</b> combine 3 random parts into one surprise icebreaker!
-              </p>
+              <div
+                className="help-popover"
+                id="slot-help"
+                role="dialog"
+                aria-modal="false"
+                aria-label="How to play"
+                style={mobileHelpStyle}
+              >
+                <p>Spin to get a random question. Ask it to a stranger to break the ice!</p>
+                <p><strong>CHAOS MODE:</strong> combine 3 random parts into one surprise icebreaker!</p>
+              </div>
             ) : null}
           </div>
         </div>
