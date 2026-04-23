@@ -669,7 +669,7 @@ main {
   white-space: nowrap;
 }
 
-.mode-toggle span {
+.mode-toggle .mode-toggle-value {
   color: var(--mode-highlight);
 }
 
@@ -702,7 +702,7 @@ main {
   text-align: left;
 }
 
-.theme-cycle-button span {
+.theme-cycle-button .theme-cycle-value {
   color: var(--theme-label);
 }
 
@@ -971,6 +971,18 @@ main {
 @media (min-width: 561px) and (max-width: 679px) {
   .question-display {
     min-height: 94px;
+  }
+}
+
+@media (max-width: 400px) {
+  .theme-cycle-prefix {
+    display: none;
+  }
+}
+
+@media (max-width: 330px) {
+  .mode-toggle-prefix {
+    display: none;
   }
 }
 
