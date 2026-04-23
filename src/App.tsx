@@ -143,14 +143,14 @@ function App() {
                   className="app-footer-palm app-footer-palm-left"
                   style={{ left: `${footerFirstLineBounds.left}px` }}
                 >
-                  🌴{'   '}
+                  🌴{'      '}
                 </span>
                 <span
                   aria-hidden="true"
                   className="app-footer-palm app-footer-palm-right"
                   style={{ left: `${footerFirstLineBounds.right}px` }}
                 >
-                  {'   '}🌴
+                  {'      '}🌴
                 </span>
               </>
             )}
