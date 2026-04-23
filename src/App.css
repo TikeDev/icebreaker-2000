@@ -855,7 +855,6 @@ main {
 
 .spin-button:disabled {
   opacity: 0.75;
-  cursor: not-allowed;
 }
 
 .help-popover {
