@@ -881,7 +881,7 @@ main {
 
 @media (max-width: 560px) {
   .title-chrome h1 {
-    font-size: 21px;
+    font-size: clamp(16px, calc(9.33px + 2.08vw), 21px);
   }
 
   .machine-panel {
