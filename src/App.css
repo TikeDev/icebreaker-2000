@@ -574,7 +574,7 @@ main {
   margin: 0;
   text-align: center;
   color: var(--title-subtitle);
-  font-size: clamp(0.64rem, 1.6vh, 0.875rem);
+  font-size: clamp(0.7rem, 1.7vh, 0.9375rem);
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -898,7 +898,7 @@ main {
     position: fixed;
     top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
     left: 0.75rem;
-        width: min(250px, calc(100vw - 1.5rem));
+    width: min(250px, calc(100vw - 1.5rem));
     max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.5rem);
     overflow-y: auto;
     overscroll-behavior: contain;
