@@ -580,6 +580,7 @@ function SlotMachine({
           isSpinning={isSpinning}
           spinVelocity={safeSpinVelocity}
           label="Safe Reel"
+          mobileVisibleRows={5}
         />
       ) : (
         <div className="chaos-reels">

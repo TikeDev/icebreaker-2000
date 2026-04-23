@@ -6,6 +6,7 @@ interface ReelProps {
   isSpinning: boolean
   spinVelocity: number
   label: string
+  mobileVisibleRows?: number
 }
 
 const DESKTOP_ROW_HEIGHT_PX = 36
@@ -20,7 +21,14 @@ const modulo = (value: number, divisor: number) => {
   return remainder < 0 ? remainder + divisor : remainder
 }
 
-function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
+function Reel({
+  items,
+  position,
+  isSpinning,
+  spinVelocity,
+  label,
+  mobileVisibleRows = MOBILE_VISIBLE_ROWS,
+}: ReelProps) {
   const [isCompactLayout, setIsCompactLayout] = useState(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
       return false
@@ -52,7 +60,8 @@ function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
   }
 
   const rowHeightPx = isCompactLayout ? MOBILE_ROW_HEIGHT_PX : DESKTOP_ROW_HEIGHT_PX
-  const visibleRowCount = isCompactLayout ? MOBILE_VISIBLE_ROWS : DESKTOP_VISIBLE_ROWS
+  const clampedMobileVisibleRows = Math.max(1, mobileVisibleRows)
+  const visibleRowCount = isCompactLayout ? clampedMobileVisibleRows : DESKTOP_VISIBLE_ROWS
   const activeRowIndex = Math.floor(visibleRowCount / 2)
   const normalizedPosition = modulo(position, items.length)
   const baseIndex = Math.floor(normalizedPosition)
@@ -83,11 +92,14 @@ function Reel({ items, position, isSpinning, spinVelocity, label }: ReelProps) {
       ? `blur(${blurAmount.toFixed(2)}px) brightness(${brightness.toFixed(2)})`
       : undefined,
   }
+  const reelWindowStyle: CSSProperties = {
+    height: `${rowHeightPx * visibleRowCount}px`,
+  }
 
   return (
     <div className="reel">
       <p className="reel-label">{label}</p>
-      <div className="reel-window" aria-hidden="true">
+      <div className="reel-window" aria-hidden="true" style={reelWindowStyle}>
         <ul className={`reel-list ${isSpinning ? 'is-spinning' : ''}`} style={reelStyle}>
           {visibleRows.map(({ item, itemIndex, rowIndex, relativeOffset }) => (
             <li
