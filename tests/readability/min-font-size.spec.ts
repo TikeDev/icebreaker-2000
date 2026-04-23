@@ -85,13 +85,15 @@ async function setMode(page: Page, targetMode: SlotMode) {
 
 async function setHelpPopoverVisibility(page: Page, shouldBeVisible: boolean) {
   const popover = page.locator('.help-popover')
-  const isVisible = await popover.isVisible()
+  const helpToggle = page.locator('.help-button')
 
-  if (isVisible === shouldBeVisible) {
-    return
+  await expect(helpToggle).toBeVisible()
+
+  const isExpanded = (await helpToggle.getAttribute('aria-expanded')) === 'true'
+  if (isExpanded !== shouldBeVisible) {
+    await helpToggle.click()
   }
 
-  await page.getByRole('button', { name: 'Show instructions' }).click()
   if (shouldBeVisible) {
     await expect(popover).toBeVisible()
   } else {
