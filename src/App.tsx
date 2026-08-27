@@ -204,7 +204,7 @@ function App() {
               </>
             )}
             <span ref={footerCopyTextRef}>
-              Created by <a href="https://kerlinemoncy.carrd.co/" target="_blank">Kerline Moncy</a> at the Miami&nbsp;Frontier&nbsp;Tech&nbsp;Week&nbsp;Hackathon&nbsp;2026
+              Created by <a href="https://kerlinemoncy.com" target="_blank">Kerline Moncy</a> 2026
             </span>
           </p>
         </footer>
