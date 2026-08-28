@@ -41,7 +41,6 @@
   "What is one networking habit that feels genuine instead of transactional?",
   "What accomplishment on your resume has the most misleading title?",
   "What is your favorite conference and why is it Commit Your Code?",
-  "What conversation changed how you think about seniority?",
   "What's the best piece of conference swag you've ever received and where was it from?",
   "What is a responsibility you declined that turned out to be the right call?",
   "Which leadership behavior do you think builds trust fastest on a new team?",
@@ -76,5 +75,14 @@
   "Which decision felt wrong in the moment but proved correct over time?",
   "What is your favorite tech related podcast?",
   "How do you turn around a bad day at work?",
-  "How did you originally find out about Commit Your Code?"
+  "How did you originally find out about Commit Your Code?",
+  "How often do you work from bed? (be honest)",
+  "What was the worst job you ever had and why?",
+  "How would you describe your job to a five year old?",
+  "Do you enjoy working from home or would you rather be in the office? Is there a balance of both that you like best?",  
+  "Did you introduce anyone to Commit Your Code who's here this week?",
+  "What do people not know about your job?",
+  "Did you ever have a mentor? What were they like?"
+
+
 ]
