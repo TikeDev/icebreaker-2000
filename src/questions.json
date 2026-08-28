@@ -48,13 +48,16 @@
   "What is one problem your product solves indirectly that you didn't expect?",
   "Which meeting format consistently earns back the time it takes?",
   "What collaboration habit do you think makes cross-functional work noticeably smoother?",
+  "If you organized a conference, what would it be about?",
   "What is your preferred way to disagree in public without creating friction?",
   "Which team tradition looked trivial to you but improved morale the most?",
   "What communication pattern helps remote collaboration feel less fragmented on your team?",
   "In your expereince, which behavior quietly signals a healthy engineering culture?",
+  "What has been your favorite conference you've ever attended?",
   "What collaboration tool do you think people misuse most on otherwise strong teams?",
   "Which failure taught you more than any success from the same year?",
   "How do you recover from a bad day at work?",
+  "How did you originally meet Danny Thompson?",
   "What opinion do you hold that usually starts a respectful debate?",
   "What process did your team add for safety that now mostly adds drag?",
   "What is one thing you stopped optimizing that actually improved results?",
@@ -69,5 +72,6 @@
   "What is one belief about productivity that you've completely reversed?",
   "Which decision felt wrong in the moment but proved correct over time?",
   "What is your favorite tech related podcast?",
-  "How do you turn around a bad day at work?"
+  "How do you turn around a bad day at work?",
+  "How did you originally find out about Commit Your Code?"
 ]
