@@ -100,7 +100,7 @@ body {
   --spin-text: #fffbe6;
 
   --popover-text: #fff7cf;
-  --popover-bg: rgba(17, 10, 10, 0.85);
+  --popover-bg: rgba(17, 10, 10, 0.94);
   --popover-border: #996308;
 
   min-height: 100vh;
@@ -191,7 +191,7 @@ body {
   --spin-text: #fffdf7;
 
   --popover-text: #fff5dc;
-  --popover-bg: rgba(14, 34, 39, 0.9);
+  --popover-bg: rgba(14, 34, 39, 0.94);
   --popover-border: #d4a764;
 }
 
@@ -269,7 +269,7 @@ body {
   --spin-text: #fff7ff;
 
   --popover-text: #ebe1ff;
-  --popover-bg: rgba(21, 12, 50, 0.9);
+  --popover-bg: rgba(21, 12, 50, 0.94);
   --popover-border: #40ecff;
 }
 
